@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>MP2 - UI v2</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    pre { background: #111; color: #0f0; padding: 1rem; border-radius: 8px; overflow:auto; }
+    h2 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <h1>MP2 - UI v2</h1>
+
+  <div class="card">
+    <h2>Clasificación YOLO</h2>
+    <form id="frm" enctype="multipart/form-data">
+      <input type="file" name="file" accept="image/*" required>
+      <button type="submit">Clasificar</button>
+    </form>
+    <h3>Resultado (JSON)</h3>
+    <pre id="out">{ "predictions": [] }</pre>
+  </div>
+
+  <div class="card">
+  <h2>Hola Mundo (hello)</h2>
+
+  <div style="display:flex; gap:1rem; align-items:center; margin-bottom:0.5rem">
+  <button id="btnHello">Probar Hello</button>
+  <div id="helloStatus"
+       style="width:14px; height:14px; border-radius:50%; background:#999;"
+       title="Estado hello"></div>
+  <small id="helloMsg" style="color:#666">Sin probar</small>
+</div>
+
+<iframe id="helloFrame" src="/hello-proxy"
+        style="width:100%; height:300px; border:1px solid #ccc; border-radius:8px;"></iframe>
+
+<script>
+const helloBtn = document.getElementById('btnHello');
+const helloStatus = document.getElementById('helloStatus');
+const helloMsg = document.getElementById('helloMsg');
+const helloFrame = document.getElementById('helloFrame');
+
+function setStatus(ok, msg) {
+  helloStatus.style.background = ok ? '#2ecc71' : '#e74c3c'; // verde/rojo
+  helloMsg.textContent = msg || (ok ? 'OK' : 'Error');
+}
+
+async function probeHello() {
+  setStatus(false, 'Probando...');
+  try {
+    const resp = await fetch('/hello-proxy', { method: 'GET' });
+    const ok = resp.ok;
+    setStatus(ok, ok ? '200 OK' : (resp.status + ' ' + resp.statusText));
+    if (ok) helloFrame.contentWindow.location.reload();
+    else    helloFrame.src = URL.createObjectURL(new Blob([await resp.text()], {type:'text/plain'}));
+  } catch (e) {
+    setStatus(false, 'Excepción: ' + String(e));
+  }
+}
+
+helloBtn.addEventListener('click', probeHello);
+// dispara una prueba automática al cargar
+window.addEventListener('load', probeHello);
+</script>
+
+
+
+<script>
+const frm = document.getElementById('frm');
+const out = document.getElementById('out');
+frm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = new FormData(frm);
+  out.textContent = "Procesando...";
+  try {
+    const resp = await fetch('/classify', { method: 'POST', body: data });
+    const txt = await resp.text(); // mostrar texto tal cual (JSON)
+    out.textContent = txt;
+  } catch (err) {
+    out.textContent = JSON.stringify({error: String(err)}, null, 2);
+  }
+});
+</script>
+</body>
+</html>
+

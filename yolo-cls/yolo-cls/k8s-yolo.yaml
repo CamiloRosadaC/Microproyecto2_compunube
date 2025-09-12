@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yolo-cls
+  namespace: mp2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yolo-cls
+  template:
+    metadata:
+      labels:
+        app: yolo-cls
+    spec:
+      containers:
+        - name: api
+          image: yolo-cls:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          resources:
+            requests: { cpu: "500m", memory: "1Gi" }
+            limits:   { cpu: "1",    memory: "2Gi" }
+          volumeMounts:
+            - name: ucache
+              mountPath: /app/.cache     # <-- cache escribible
+      volumes:
+        - name: ucache
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yolo-cls-svc
+  namespace: mp2
+spec:
+  type: NodePort
+  selector:
+    app: yolo-cls
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      nodePort: 31111
+

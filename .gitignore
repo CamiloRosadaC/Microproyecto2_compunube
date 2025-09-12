@@ -1,0 +1,29 @@
+# python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+.env
+
+# editor/so
+.DS_Store
+*.swp
+*.swo
+
+# docker
+*.log
+
+# k8s (no ignoramos los yaml del proyecto)
+# !*.yaml
+
+# node (por si usaste algo)
+node_modules/
+
+# imágenes pesadas que no queremos versionar (ejemplo)
+*.jpg
+*.png
+*.pt
+*.onnx
