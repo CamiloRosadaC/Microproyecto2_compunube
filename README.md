@@ -1,3 +1,9 @@
+# Presentado por:
+Camilo Eduardo Rosada Caicedo - 2205121
+
+Edilmer Chachinoy Narvaez - 22501262
+
+
 # Microproyecto 2 – Computación en la Nube (Minikube)
 
 Implementación en **Minikube (2 nodos)** de:
