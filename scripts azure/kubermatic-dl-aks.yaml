@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubermatic-dl-deployment
+  namespace: hola
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kubermatic-dl
+  template:
+    metadata:
+      labels:
+        app: kubermatic-dl
+    spec:
+      containers:
+        - name: kubermatic-dl
+          image: edilmerchachinoy/kubermatic-dl:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: "5000"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 2
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubermatic-dl-service
+  namespace: hola
+spec:
+  type: LoadBalancer
+  selector:
+    app: kubermatic-dl
+  ports:
+    - port: 80
+      targetPort: 5000

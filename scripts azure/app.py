@@ -5,7 +5,7 @@ from PIL import Image
 
 import mxnet as mx
 from mxnet import nd
-from gluoncv.model_zoo import get_model  
+from gluoncv.model_zoo import get_model  # <- OJO: GluonCV
 
 app = Flask(__name__)
 

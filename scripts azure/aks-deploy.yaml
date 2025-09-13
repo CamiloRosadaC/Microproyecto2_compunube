@@ -1,0 +1,58 @@
+# aks-deploy.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hola
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hola-app
+  namespace: hola
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hola-app
+  template:
+    metadata:
+      labels:
+        app: hola-app
+    spec:
+      containers:
+      - name: hola-app
+        image: nginx:alpine  # Imagen pública oficial de Nginx
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hola-service
+  namespace: hola
+spec:
+  selector:
+    app: hola-app
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
